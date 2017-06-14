@@ -20,8 +20,10 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
         private set
 
     object Spec {
-        const val JUMP_SHAKE_INTERVAL: Float = 0.1f
-        const val GRAVITY: Float = 3f
+        const val JUMP_SHAKE_INTERVAL: Float = 0.2f
+        const val GRAVITY: Float = 3.5f
+        const val SPEED_INCREASE_RATE: Float = 3.0f
+        const val SPEED_UPPER_LIMIT: Float = 400.0f
     }
 
     private var jump_shakeTimer: Float = 0f
@@ -31,9 +33,6 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
     }
 
     fun update(dt: Float) {
-        x += forwardVelocity * dt
-        y += jumpVelocity * dt
-
         if (!onGround) {
             jumpVelocity += Spec.GRAVITY * dt
 
@@ -58,11 +57,23 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
     }
 
     fun speedUp() {
-        forwardVelocity += 0.1f
+        forwardVelocity += Spec.SPEED_INCREASE_RATE
+        Gdx.app.log("Player", "Increased speed to $forwardVelocity")
+
+        if (forwardVelocity > Spec.SPEED_UPPER_LIMIT) {
+            forwardVelocity = Spec.SPEED_UPPER_LIMIT
+        }
     }
 
     fun speedDown() {
-        forwardVelocity -= 0.1f
+        forwardVelocity -= Spec.SPEED_INCREASE_RATE
+        if (forwardVelocity < 0f) {
+            forwardVelocity = 0.0f
+        }
+    }
+
+    fun strafeLeft() {
+
     }
 
     fun jump() {

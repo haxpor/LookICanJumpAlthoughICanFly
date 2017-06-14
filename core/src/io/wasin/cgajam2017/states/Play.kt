@@ -25,6 +25,10 @@ class Play(gsm: GameStateManager): GameState(gsm) {
     private var playerCam: OrthographicCamera
     lateinit private var player: Player
 
+    private var isReachedFarRight: Boolean = false
+    private var isReachedFarLeft: Boolean = false
+    private var playerCamTranslatedXOffset: Float = 0f
+
     init {
 
         // create tilemap and get tilesize from map
@@ -46,11 +50,51 @@ class Play(gsm: GameStateManager): GameState(gsm) {
             Gdx.app.log("Play", "Jump button is pressed")
             player.jump()
         }
+        if (BBInput.isDown(BBInput.BUTTON_UP)) {
+            Gdx.app.log("Play", "Speed up")
+            player.speedUp()
+        }
+        if (BBInput.isDown(BBInput.BUTTON_DOWN)) {
+            Gdx.app.log("Play", "Speed down")
+            player.speedDown()
+        }
+        if (BBInput.isPressed(BBInput.BUTTON_LEFT)) {
 
+            if (!isReachedFarLeft) {
+                Gdx.app.log("Play", "Strafe left")
+                playerCamTranslatedXOffset -= 40f
+                playerCam.translate(-40f, 0f)
+
+                if (playerCamTranslatedXOffset == -40f) {
+                    isReachedFarLeft = true
+                }
+                isReachedFarRight = false
+
+                Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
+            }
+        }
+        if (BBInput.isPressed(BBInput.BUTTON_RIGHT)) {
+            if (!isReachedFarRight) {
+                Gdx.app.log("Play", "Strafe right")
+                playerCamTranslatedXOffset += 40f
+                playerCam.translate(40f, 0f)
+
+                if (playerCamTranslatedXOffset == 40.0f) {
+                    isReachedFarRight = true
+                }
+                isReachedFarLeft = false
+
+                Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
+            }
+        }
     }
 
     override fun update(dt: Float) {
         handleInput()
+
+        // update playerCam according to player's forward velocity
+        playerCam.position.y += player.forwardVelocity * dt
+        playerCam.update()
 
         player.update(dt)
     }
@@ -60,7 +104,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         Gdx.gl20.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        sb.projectionMatrix = cam.combined
+        sb.projectionMatrix = playerCam.combined
         sb.begin()
 
         // draw tilemap
@@ -70,7 +114,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
 
         sb.begin()
         // draw player
-        player.setPosition(playerCam.viewportWidth/2f - player.width/2, playerCam.position.y - playerCam.viewportHeight/2 + 10f + player.height/2f)
+        player.setPosition(playerCam.viewportWidth/2f + player.width/2f, playerCam.position.y - playerCam.viewportHeight/2 + 30f + player.height/2f)
         player.draw(sb)
 
         sb.end()
