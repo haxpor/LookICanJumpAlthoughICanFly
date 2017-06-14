@@ -3,11 +3,14 @@ package io.wasin.cgajam2017.states
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import io.wasin.cgajam2017.Game
+import io.wasin.cgajam2017.entities.Player
+import io.wasin.cgajam2017.handlers.BBInput
 import io.wasin.cgajam2017.handlers.GameStateManager
 
 /**
@@ -20,6 +23,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
     private var tileSize: Float
 
     private var playerCam: OrthographicCamera
+    lateinit private var player: Player
 
     init {
 
@@ -33,10 +37,14 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         playerCam.setToOrtho(false, Game.V_WIDTH, Game.V_HEIGHT)
         playerCam.translate(tileSize/2, 0f)
         playerCam.update()
+
+        createPlayer()
     }
 
     override fun handleInput() {
-
+        if (BBInput.isPressed(BBInput.BUTTON1)) {
+            Gdx.app.log("Play", "Jump button is pressed")
+        }
     }
 
     override fun update(dt: Float) {
@@ -54,6 +62,12 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         // draw tilemap
         tmr.setView(playerCam)
         tmr.render()
+        sb.end()
+
+        sb.begin()
+        // draw player
+        player.setPosition(playerCam.viewportWidth/2f - player.width/2, playerCam.position.y - playerCam.viewportHeight/2 + 10f + player.height/2f)
+        player.draw(sb)
 
         sb.end()
     }
@@ -74,5 +88,11 @@ class Play(gsm: GameStateManager): GameState(gsm) {
 
             }
         }
+    }
+
+    private fun createPlayer() {
+        val tex = Game.res.getTexture("jet")!!
+        val texRegion = TextureRegion(tex, 0, 0, 32, 32)
+        player = Player(texRegion)
     }
 }

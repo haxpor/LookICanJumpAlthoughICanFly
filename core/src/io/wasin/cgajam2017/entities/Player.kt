@@ -1,5 +1,6 @@
 package io.wasin.cgajam2017.entities
 
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.wasin.cgajam2017.Game
@@ -7,19 +8,11 @@ import io.wasin.cgajam2017.Game
 /**
  * Created by haxpor on 6/14/17.
  */
-class Player {
+class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
 
-    lateinit private var textureRegion: TextureRegion
+    var onGround: Boolean = false
 
     init {
-        val tex = Game.res.getTexture("jet")!!
-    }
-
-    fun update(dt: Float) {
-
-    }
-
-    fun render(sb: SpriteBatch) {
 
     }
 }

@@ -36,7 +36,7 @@ class Game : ApplicationAdapter() {
 		playerSaveFileManager = PlayerSaveFileManager(Settings.PLAYER_SAVEFILE_RELATIVE_PATH)
 
         res.loadTexture("tiles.png", "tiles")
-        //res.loadTexture("jet.png", "jet")
+        res.loadTexture("jet.png", "jet")
 
 		// set to begin with Play state
 		gsm.pushState(GameStateManager.PLAY)
