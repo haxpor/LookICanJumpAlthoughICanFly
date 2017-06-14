@@ -5,11 +5,18 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.wasin.cgajam2017.Game
 
 /**
+ * Pallete type.
+ */
+enum class PalleteType {
+    CGA_0,
+    CGA_1
+}
+
+/**
  * Created by haxpor on 6/13/17.
  */
-class Tile(x: Float, y: Float, width: Float, height: Float): Box(x, y, 0f, 0f) {
-    private val light: TextureRegion
-    private val dark: TextureRegion
+class Tile(x: Float, y: Float, width: Float, height: Float, palleteIndex: Int, palleteType: PalleteType): Box(x, y, 0f, 0f) {
+    private val textureRegion: TextureRegion
     private var timer: Float = 0f
     private var maxTime: Float = 0.5f
     private var totalWidth: Float = width - 8
@@ -18,9 +25,11 @@ class Tile(x: Float, y: Float, width: Float, height: Float): Box(x, y, 0f, 0f) {
     var selected: Boolean = false
 
     init {
-        val atlas = Game.res.getAtlas("pack")!!
-        light = atlas.findRegion("light")
-        dark = atlas.findRegion("dark")
+        val tex = Game.res.getTexture("cga-palletes")!!
+
+        // get the pallete to color this tile
+        val regionY = if (palleteType == PalleteType.CGA_0) 0 else 1
+        textureRegion = TextureRegion(tex, palleteIndex, regionY, 1, 1)
     }
 
     fun update(dt: Float) {
@@ -45,12 +54,7 @@ class Tile(x: Float, y: Float, width: Float, height: Float): Box(x, y, 0f, 0f) {
     }
 
     fun render(sb: SpriteBatch) {
-        if (selected) {
-            sb.draw(light, x - width / 2, y - height / 2, width, height)
-        }
-        else {
-            sb.draw(dark, x - width / 2, y - height / 2, width, height)
-        }
+        sb.draw(textureRegion, x, y, width, height)
     }
 
     fun setTimer(timer: Float) {

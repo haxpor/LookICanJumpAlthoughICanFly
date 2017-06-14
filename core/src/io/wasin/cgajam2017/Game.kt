@@ -35,7 +35,7 @@ class Game : ApplicationAdapter() {
 		// create player's savefile manager with pre-set of savefile's path
 		playerSaveFileManager = PlayerSaveFileManager(Settings.PLAYER_SAVEFILE_RELATIVE_PATH)
 
-		// load assets here...
+        res.loadTexture("cga-palletes.png", "cga-palletes")
 
 		// set to begin with Play state
 		gsm.pushState(GameStateManager.PLAY)
