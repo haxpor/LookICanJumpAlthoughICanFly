@@ -37,6 +37,7 @@ class Game : ApplicationAdapter() {
 
         res.loadTexture("tiles.png", "tiles")
         res.loadTexture("jet.png", "jet")
+        res.loadTexture("smoke.png", "smoke")
 
 		// set to begin with Play state
 		gsm.pushState(GameStateManager.PLAY)

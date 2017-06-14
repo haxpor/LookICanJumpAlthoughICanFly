@@ -8,8 +8,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.math.MathUtils
 import io.wasin.cgajam2017.Game
 import io.wasin.cgajam2017.entities.Player
+import io.wasin.cgajam2017.entities.Smoke
+import io.wasin.cgajam2017.entities.SmokePool
 import io.wasin.cgajam2017.handlers.BBInput
 import io.wasin.cgajam2017.handlers.GameStateManager
 
@@ -28,6 +31,8 @@ class Play(gsm: GameStateManager): GameState(gsm) {
     private var isReachedFarRight: Boolean = false
     private var isReachedFarLeft: Boolean = false
     private var playerCamTranslatedXOffset: Float = 0f
+    private var smokePool: SmokePool
+    private var activeSmoke: ArrayList<Smoke>
 
     init {
 
@@ -42,14 +47,13 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         playerCam.translate(tileSize/2, 0f)
         playerCam.update()
 
+        smokePool = SmokePool(3)
+        activeSmoke = ArrayList<Smoke>()
+
         createPlayer()
     }
 
     override fun handleInput() {
-        if (BBInput.isPressed(BBInput.BUTTON1)) {
-            Gdx.app.log("Play", "Jump button is pressed")
-            player.jump()
-        }
         if (BBInput.isDown(BBInput.BUTTON_UP)) {
             Gdx.app.log("Play", "Speed up")
             player.speedUp()
@@ -87,6 +91,19 @@ class Play(gsm: GameStateManager): GameState(gsm) {
                 Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
             }
         }
+        if (BBInput.isPressed(BBInput.BUTTON1)) {
+            if (player.onGround) {
+                Gdx.app.log("Play", "Jump button is pressed")
+                player.jump()
+
+                // spawn a new smoke
+                val smoke = smokePool.obtain()
+                smoke.spawnAt(player.x, player.y, MathUtils.random(2.2f, 3.2f))
+                smoke.callbackFadedOut = { it.markToRemove() }
+                // add to active smoke
+                activeSmoke.add(smoke)
+            }
+        }
     }
 
     override fun update(dt: Float) {
@@ -97,6 +114,17 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         playerCam.update()
 
         player.update(dt)
+        activeSmoke.filter { !it.markedToBeRemoved }.map { it.update(dt) }
+
+        if (activeSmoke.count() > 0) {
+            for (i in activeSmoke.count() - 1 downTo 0) {
+                val item = activeSmoke.get(i)
+                if (item.markedToBeRemoved) {
+                    activeSmoke.removeAt(i)
+                    smokePool.free(item)
+                }
+            }
+        }
     }
 
     override fun render() {
@@ -113,6 +141,12 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         sb.end()
 
         sb.begin()
+
+        // draw smoke
+        for (smoke in activeSmoke) {
+            smoke.draw(sb)
+        }
+
         // draw player
         player.setPosition(playerCam.viewportWidth/2f + player.width/2f, playerCam.position.y - playerCam.viewportHeight/2 + 30f + player.height/2f)
         player.draw(sb)
