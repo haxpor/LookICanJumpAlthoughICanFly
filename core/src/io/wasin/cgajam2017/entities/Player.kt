@@ -19,9 +19,12 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
     var jumpVelocity: Float = 0f
         private set
 
+    object Spec {
+        const val JUMP_SHAKE_INTERVAL: Float = 0.1f
+        const val GRAVITY: Float = 3f
+    }
+
     private var jump_shakeTimer: Float = 0f
-    private var jump_shakeDuration: Float = 0.1f
-    private var gravity: Float = 3f
 
     init {
 
@@ -32,15 +35,15 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
         y += jumpVelocity * dt
 
         if (!onGround) {
-            jumpVelocity += gravity * dt
+            jumpVelocity += Spec.GRAVITY * dt
 
             // scale to make illusion of jumping
-            setScale(Math.abs(jumpVelocity / gravity))
+            setScale(Math.abs(jumpVelocity / Spec.GRAVITY))
 
             jump_shakeTimer += dt
-            if (jump_shakeTimer > jump_shakeDuration) {
+            if (jump_shakeTimer > Spec.JUMP_SHAKE_INTERVAL) {
                 rotation = MathUtils.random(-5f, 5f)
-                jump_shakeTimer -= jump_shakeDuration
+                jump_shakeTimer -= Spec.JUMP_SHAKE_INTERVAL
             }
         }
 

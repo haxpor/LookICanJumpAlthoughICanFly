@@ -46,6 +46,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
             Gdx.app.log("Play", "Jump button is pressed")
             player.jump()
         }
+
     }
 
     override fun update(dt: Float) {
