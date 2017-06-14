@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import io.wasin.cgajam2017.Game
 
@@ -18,6 +19,8 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
         private set
     var jumpVelocity: Float = 0f
         private set
+
+    var endScaleFromJump: Float = 1.0f
 
     object Spec {
         const val JUMP_SHAKE_INTERVAL: Float = 0.2f
@@ -37,7 +40,8 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
             jumpVelocity += Spec.GRAVITY * dt
 
             // scale to make illusion of jumping
-            setScale(Math.abs(jumpVelocity / Spec.GRAVITY))
+            val newScale = Interpolation.bounceIn.apply(Math.abs(jumpVelocity / Spec.GRAVITY) / Math.abs(endScaleFromJump)) * endScaleFromJump
+            setScale(newScale)
 
             jump_shakeTimer += dt
             if (jump_shakeTimer > Spec.JUMP_SHAKE_INTERVAL) {
@@ -54,6 +58,8 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
             rotation = 0f
             Gdx.app.log("Player", "Player back to touch the ground")
         }
+
+        Gdx.app.log("Player", "Scale $scaleX")
     }
 
     fun speedUp() {
@@ -81,6 +87,9 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
             jump_shakeTimer = 0.0f
             onGround = false
             jumpVelocity = -6.0f
+
+            // calculate the reference end of jump speed
+            endScaleFromJump = Math.abs(jumpVelocity / Spec.GRAVITY)
         }
     }
 }
