@@ -44,11 +44,14 @@ class Play(gsm: GameStateManager): GameState(gsm) {
     override fun handleInput() {
         if (BBInput.isPressed(BBInput.BUTTON1)) {
             Gdx.app.log("Play", "Jump button is pressed")
+            player.jump()
         }
     }
 
     override fun update(dt: Float) {
         handleInput()
+
+        player.update(dt)
     }
 
     override fun render() {

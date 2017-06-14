@@ -1,8 +1,10 @@
 package io.wasin.cgajam2017.entities
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import io.wasin.cgajam2017.Game
 
 /**
@@ -10,9 +12,61 @@ import io.wasin.cgajam2017.Game
  */
 class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
 
-    var onGround: Boolean = false
+    var onGround: Boolean = true
+
+    var forwardVelocity: Float = 0f
+        private set
+    var jumpVelocity: Float = 0f
+        private set
+
+    private var jump_shakeTimer: Float = 0f
+    private var jump_shakeDuration: Float = 0.1f
+    private var gravity: Float = 3f
 
     init {
 
+    }
+
+    fun update(dt: Float) {
+        x += forwardVelocity * dt
+        y += jumpVelocity * dt
+
+        if (!onGround) {
+            jumpVelocity += gravity * dt
+
+            // scale to make illusion of jumping
+            setScale(Math.abs(jumpVelocity / gravity))
+
+            jump_shakeTimer += dt
+            if (jump_shakeTimer > jump_shakeDuration) {
+                rotation = MathUtils.random(-5f, 5f)
+                jump_shakeTimer -= jump_shakeDuration
+            }
+        }
+
+        // reset onGround flag if touch the ground
+        if (!onGround && scaleX - 1.0f <= 0.001f) {
+            onGround = true
+            jump_shakeTimer = 0.0f
+            setScale(1.0f)
+            rotation = 0f
+            Gdx.app.log("Player", "Player back to touch the ground")
+        }
+    }
+
+    fun speedUp() {
+        forwardVelocity += 0.1f
+    }
+
+    fun speedDown() {
+        forwardVelocity -= 0.1f
+    }
+
+    fun jump() {
+        if (onGround) {
+            jump_shakeTimer = 0.0f
+            onGround = false
+            jumpVelocity = -6.0f
+        }
     }
 }
