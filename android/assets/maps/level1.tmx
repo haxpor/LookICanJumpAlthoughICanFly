@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0.0" orientation="orthogonal" renderorder="right-down" width="7" height="20" tilewidth="80" tileheight="80" nextobjectid="1">
- <tileset firstgid="1" source="../cga-palletes.tsx"/>
+ <tileset firstgid="1" source="../tiles.tsx"/>
  <layer name="floor" width="7" height="20">
   <data encoding="csv">
 0,0,0,3,0,0,0,
@@ -15,11 +15,11 @@
 0,0,1,4,1,0,0,
 0,1,0,4,0,1,0,
 0,1,0,4,0,1,0,
+1,1,0,4,0,1,1,
+1,1,0,0,0,1,1,
 0,1,0,4,0,1,0,
-0,1,0,0,0,1,0,
 0,1,0,4,0,1,0,
-0,1,0,4,0,1,0,
-0,1,0,4,0,1,0,
+1,1,0,4,0,1,1,
 0,0,1,0,1,0,0,
 0,0,0,1,0,0,0,
 0,0,0,1,0,0,0

@@ -71,7 +71,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
 
         for (row in 0..layer.width-1) {
             for (col in 0..layer.height-1) {
-                
+
             }
         }
     }
