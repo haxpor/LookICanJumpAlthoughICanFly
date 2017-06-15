@@ -157,7 +157,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         }
 
         // draw player
-        player.setPosition(playerCam.viewportWidth/2f + player.width/2f, playerCamTargetPosition.y - playerCam.viewportHeight/2 + player.height/2f)
+        player.setPosition(playerCam.viewportWidth/2f + player.width/2f + 8f, playerCamTargetPosition.y - playerCam.viewportHeight/2 + player.height/2f)
         player.draw(sb)
 
         sb.end()
