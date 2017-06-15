@@ -147,10 +147,6 @@ class Play(gsm: GameStateManager): GameState(gsm), CollisionListener, PlayerList
         if (player.onFall) {
 
             sb.begin()
-            // draw smoke
-            for (smoke in activeSmoke) {
-                smoke.draw(sb)
-            }
             // draw player
             player.draw(sb)
             sb.end()
@@ -159,6 +155,14 @@ class Play(gsm: GameStateManager): GameState(gsm), CollisionListener, PlayerList
             // draw tilemap
             tmr.setView(playerCam)
             tmr.render()
+
+            sb.end()
+
+            sb.begin()
+            // draw smoke
+            for (smoke in activeSmoke) {
+                smoke.draw(sb)
+            }
             sb.end()
         }
         else {
@@ -206,7 +210,7 @@ class Play(gsm: GameStateManager): GameState(gsm), CollisionListener, PlayerList
     }
 
     override fun playerOnFall(player: Player, tileMap: TiledMap, col: Int, row: Int) {
-        Gdx.app.log("Player", "Player starts to fall")
+
         player.fall()
         camLerpSpeed = 0.15f
     }

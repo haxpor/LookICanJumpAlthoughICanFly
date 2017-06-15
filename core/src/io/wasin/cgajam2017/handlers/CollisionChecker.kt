@@ -41,9 +41,13 @@ class CollisionChecker(player: Player, tilemap: TiledMap, cam: OrthographicCamer
             val (col, row) = convertPlayerPositionToTilePosition()
 
             var cell = layer.getCell(col, row)
+            Gdx.app.log("CollisionChecker", "at $col,$row")
             if (cell == null || (cell != null && cell.tile == null)) {
-                listener?.playerOnFall(player, tilemap, col, row)
-                isPlayerFell = true
+                if (player.onGround) {
+                    Gdx.app.log("CollisionChecker", "${player.scaleX}")
+                    listener?.playerOnFall(player, tilemap, col, row)
+                    isPlayerFell = true
+                }
             }
         }
     }
