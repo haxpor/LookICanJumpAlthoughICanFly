@@ -5,6 +5,22 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector2
+
+/**
+ * Player listener to react to what has happened to player
+ */
+interface PlayerListener {
+    /**
+     * Player touches on the ground (optional)
+     */
+    fun onGround(player: Player) {}
+
+    /**
+     * Player completely dead from falling (optional)
+     */
+    fun onCompletelyDead(player: Player) {}
+}
 
 /**
  * Created by haxpor on 6/14/17.
@@ -12,6 +28,15 @@ import com.badlogic.gdx.math.MathUtils
 class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
 
     var onGround: Boolean = true
+        private set
+    var onFall: Boolean = false
+        private set
+    var isAlive: Boolean = true
+        private set
+
+    private var fallScale: Vector2 = Vector2(1.0f, 1.0f)
+    private val fallTargetScale: Vector2 = Vector2(0f, 0f)
+    private val fallLerpSpeed: Float = 0.1f
 
     var forwardVelocity: Float = 0f
         private set
@@ -19,6 +44,7 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
         private set
 
     var endScaleFromJump: Float = 1.0f
+    var listener: PlayerListener? = null
 
     object Spec {
         const val JUMP_SHAKE_INTERVAL: Float = 0.2f
@@ -34,27 +60,42 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
     }
 
     fun update(dt: Float) {
-        if (!onGround) {
-            jumpVelocity += Spec.GRAVITY * dt
+        if (isAlive) {
+            if (!onGround && !onFall) {
+                jumpVelocity += Spec.GRAVITY * dt
 
-            // scale to make illusion of jumping
-            val newScale = Interpolation.bounceIn.apply(Math.abs(jumpVelocity / Spec.GRAVITY) / Math.abs(endScaleFromJump)) * endScaleFromJump
-            setScale(newScale)
+                // scale to make illusion of jumping
+                val newScale = Interpolation.bounceIn.apply(Math.abs(jumpVelocity / Spec.GRAVITY) / Math.abs(endScaleFromJump)) * endScaleFromJump
+                setScale(newScale)
 
-            jump_shakeTimer += dt
-            if (jump_shakeTimer > Spec.JUMP_SHAKE_INTERVAL) {
-                rotation = MathUtils.random(-5f, 5f)
-                jump_shakeTimer -= Spec.JUMP_SHAKE_INTERVAL
+                jump_shakeTimer += dt
+                if (jump_shakeTimer > Spec.JUMP_SHAKE_INTERVAL) {
+                    rotation = MathUtils.random(-5f, 5f)
+                    jump_shakeTimer -= Spec.JUMP_SHAKE_INTERVAL
+                }
             }
-        }
 
-        // reset onGround flag if touch the ground
-        if (!onGround && scaleX - 1.0f <= 0.001f) {
-            onGround = true
-            jump_shakeTimer = 0.0f
-            setScale(1.0f)
-            rotation = 0f
-            Gdx.app.log("Player", "Player back to touch the ground")
+            // reset onGround flag if touch the ground
+            if (!onGround && !onFall && scaleX -1.0f <= 0.001f) {
+                onGround = true
+                jump_shakeTimer = 0.0f
+                setScale(1.0f)
+                rotation = 0f
+                Gdx.app.log("Player", "Player back to touch the ground")
+
+                listener?.onGround(this)
+            }
+
+            if (onFall) {
+                // make use of Vector2, but one value of its will do it
+                fallScale.lerp(fallTargetScale, fallLerpSpeed)
+                setScale(fallScale.x)
+
+                if (fallScale.epsilonEquals(fallTargetScale, 0.001f)) {
+                    isAlive = false
+                    listener?.onCompletelyDead(this)
+                }
+            }
         }
     }
 
@@ -74,10 +115,6 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
         }
     }
 
-    fun strafeLeft() {
-
-    }
-
     fun jump() {
         if (onGround) {
             jump_shakeTimer = 0.0f
@@ -87,5 +124,11 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
             // calculate the reference end of jump speed
             endScaleFromJump = Math.abs(jumpVelocity / Spec.GRAVITY)
         }
+    }
+
+    fun fall() {
+        onGround = false
+        forwardVelocity = 0f
+        onFall = true   // begin falling process
     }
 }
