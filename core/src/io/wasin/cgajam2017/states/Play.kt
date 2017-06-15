@@ -30,8 +30,6 @@ class Play(gsm: GameStateManager): GameState(gsm) {
     private var playerCamTargetPosition: Vector3 = Vector3.Zero
     lateinit private var player: Player
 
-    private var isReachedFarRight: Boolean = false
-    private var isReachedFarLeft: Boolean = false
     private var playerCamTranslatedXOffset: Float = 0f
     private var smokePool: SmokePool
     private var activeSmoke: ArrayList<Smoke>
@@ -69,34 +67,21 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         }
         if (BBInput.isPressed(BBInput.BUTTON_LEFT)) {
 
-            if (!isReachedFarLeft) {
-                Gdx.app.log("Play", "Strafe left")
-                playerCamTranslatedXOffset -= 40f
-                //playerCam.translate(-40f, 0f)
-                playerCamTargetPosition.x += -40f
+            Gdx.app.log("Play", "Strafe left")
+            playerCamTranslatedXOffset -= 40f
+            //playerCam.translate(-40f, 0f)
+            playerCamTargetPosition.x += -40f*2
 
-                if (playerCamTranslatedXOffset == -40f) {
-                    isReachedFarLeft = true
-                }
-                isReachedFarRight = false
-
-                Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
-            }
+            Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
         }
         if (BBInput.isPressed(BBInput.BUTTON_RIGHT)) {
-            if (!isReachedFarRight) {
-                Gdx.app.log("Play", "Strafe right")
-                playerCamTranslatedXOffset += 40f
-                //playerCam.translate(40f, 0f)
-                playerCamTargetPosition.x += 40.0f
 
-                if (playerCamTranslatedXOffset == 40.0f) {
-                    isReachedFarRight = true
-                }
-                isReachedFarLeft = false
+            Gdx.app.log("Play", "Strafe right")
+            playerCamTranslatedXOffset += 40f
+            //playerCam.translate(40f, 0f)
+            playerCamTargetPosition.x += 40.0f*2
 
-                Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
-            }
+            Gdx.app.log("Play", "xoffset $playerCamTranslatedXOffset")
         }
         if (BBInput.isPressed(BBInput.BUTTON1)) {
             if (player.onGround) {
@@ -157,7 +142,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         }
 
         // draw player
-        player.setPosition(playerCam.viewportWidth/2f + player.width/2f + 8f, playerCamTargetPosition.y - playerCam.viewportHeight/2 + player.height/2f)
+        player.setPosition(playerCamTargetPosition.x - player.width/2f, playerCamTargetPosition.y - playerCam.viewportHeight/2 + player.height/2f)
         player.draw(sb)
 
         sb.end()

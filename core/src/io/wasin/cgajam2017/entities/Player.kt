@@ -56,8 +56,6 @@ class Player(textureRegion: TextureRegion): Sprite(textureRegion) {
             rotation = 0f
             Gdx.app.log("Player", "Player back to touch the ground")
         }
-
-        Gdx.app.log("Player", "Scale $scaleX")
     }
 
     fun speedUp() {
