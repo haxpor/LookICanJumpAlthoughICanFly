@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector3
 import io.wasin.cgajam2017.Game
 import io.wasin.cgajam2017.entities.Player
 import io.wasin.cgajam2017.entities.Smoke
@@ -26,6 +27,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
     private var tileSize: Float
 
     private var playerCam: OrthographicCamera
+    private var playerCamTargetPosition: Vector3 = Vector3.Zero
     lateinit private var player: Player
 
     private var isReachedFarRight: Boolean = false
@@ -47,6 +49,9 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         playerCam.translate(tileSize/2, 0f)
         playerCam.update()
 
+        // save the target player cam's position
+        playerCamTargetPosition = Vector3(playerCam.position)
+
         smokePool = SmokePool(3)
         activeSmoke = ArrayList<Smoke>()
 
@@ -67,7 +72,8 @@ class Play(gsm: GameStateManager): GameState(gsm) {
             if (!isReachedFarLeft) {
                 Gdx.app.log("Play", "Strafe left")
                 playerCamTranslatedXOffset -= 40f
-                playerCam.translate(-40f, 0f)
+                //playerCam.translate(-40f, 0f)
+                playerCamTargetPosition.x += -40f
 
                 if (playerCamTranslatedXOffset == -40f) {
                     isReachedFarLeft = true
@@ -81,7 +87,8 @@ class Play(gsm: GameStateManager): GameState(gsm) {
             if (!isReachedFarRight) {
                 Gdx.app.log("Play", "Strafe right")
                 playerCamTranslatedXOffset += 40f
-                playerCam.translate(40f, 0f)
+                //playerCam.translate(40f, 0f)
+                playerCamTargetPosition.x += 40.0f
 
                 if (playerCamTranslatedXOffset == 40.0f) {
                     isReachedFarRight = true
@@ -110,7 +117,9 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         handleInput()
 
         // update playerCam according to player's forward velocity
-        playerCam.position.y += player.forwardVelocity * dt
+        // make the delay camera
+        playerCamTargetPosition.y += player.forwardVelocity * dt
+        playerCam.position.lerp(playerCamTargetPosition, 0.1f)
         playerCam.update()
 
         player.update(dt)
@@ -148,7 +157,7 @@ class Play(gsm: GameStateManager): GameState(gsm) {
         }
 
         // draw player
-        player.setPosition(playerCam.viewportWidth/2f + player.width/2f, playerCam.position.y - playerCam.viewportHeight/2 + 30f + player.height/2f)
+        player.setPosition(playerCam.viewportWidth/2f + player.width/2f, playerCamTargetPosition.y - playerCam.viewportHeight/2 + player.height/2f)
         player.draw(sb)
 
         sb.end()
